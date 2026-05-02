@@ -1,14 +1,18 @@
 /**
  * api.js — Qatar Foundation Admin Portal
- * Handles AUTH ONLY: login, signup, forgot password, logout.
- * Opportunity management is handled by opportunities.js
+ * Auth only: login, signup, forgot password, logout.
  */
 (function () {
   "use strict";
 
-  const API_BASE = "http://127.0.0.1:5000/api";
+  // Auto-detects localhost vs live hosted URL
+  const API_BASE = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
+    ? "http://127.0.0.1:5000/api"
+    : window.location.origin + "/api";
 
-  /* Storage  */
+  /* ── Storage  */
+
+
   const saveToken = t => localStorage.setItem("qf_token", t);
   const getToken  = () => localStorage.getItem("qf_token");
   const clearAuth = () => {
@@ -17,7 +21,7 @@
   };
   const saveAdmin = a => localStorage.setItem("qf_admin", JSON.stringify(a));
 
-  /*  Fetch  */
+  /* ── Fetch  */
 
 
   async function apiFetch(endpoint, options = {}) {
@@ -40,8 +44,7 @@
     return data;
   }
 
-  /*  Helpers */
-
+  /* ── Helpers  */
 
 
   const $   = id => document.getElementById(id);
@@ -55,9 +58,7 @@
     el.classList.add("show");
   }
 
-
-  /*CAPTURE-PHASE — intercepts auth forms before admin.js */
-
+  /* ── Capture-phase interceptor  */
 
 
   document.addEventListener("submit", async function (e) {
@@ -74,8 +75,7 @@
     }
   }, true);
 
-
-  /* LOGIN */
+  /* ── LOGIN  */
 
 
   async function doLogin() {
@@ -112,7 +112,9 @@
     }
   }
 
-  /* SIGNUP */
+  /* ── SIGNUP  */
+
+
   async function doSignup() {
     clearAllErrors("signupForm");
     const name     = val("signupName");
@@ -148,7 +150,7 @@
     }
   }
 
-  /* FORGOT PASSWORD  */
+  /* ── FORGOT PASSWORD  */
 
 
   async function doForgot() {
@@ -162,7 +164,6 @@
     else if (captcha !== captchas.forgot)  { markErr(null,"forgotCaptchaErr","Captcha does not match."); generateCaptcha("forgot"); ok = false; }
     if (!ok) { shakeForm("forgotForm"); return; }
 
-    // Always show same message regardless of whether email exists (US-1.3)
     try { await apiFetch("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }); }
     catch (_) {}
 
@@ -171,7 +172,7 @@
     $("forgotForm").reset();
   }
 
-  /*  QUICK ADD STUDENT */
+  /* ── QUICK ADD STUDENT  */
 
 
   async function doQuickAddStudent() {
@@ -185,7 +186,7 @@
     $("quickAddForm").reset();
   }
 
-  /*  QUICK ADD VERIFIER  */
+  /* ── QUICK ADD VERIFIER  */
 
 
   async function doQuickAddVerifier() {
@@ -199,9 +200,7 @@
     $("quickAddVerifierForm").reset();
   }
 
-  /* LOGOUT */
-
-  
+  /* ── LOGOUT  */
   const _origLogout = window.handleLogout;
   window.handleLogout = async function () {
     try { await apiFetch("/auth/logout", { method: "POST" }); } catch (_) {}
@@ -209,5 +208,5 @@
     if (typeof _origLogout === "function") _origLogout();
   };
 
-  console.log("[api.js] ✓ Auth integration loaded");
+  console.log("[api.js] Auth integration loaded — API:", API_BASE);
 })();
