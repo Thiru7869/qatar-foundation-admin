@@ -2,6 +2,11 @@
 
 ---
 
+Live Demo
+Hosted URL: https://qatar-foundation-admin.onrender.com
+
+⚠️ Note: This app is hosted on Render's free tier. If the link takes 30–60 seconds to load on first visit, that is normal — the server goes to sleep after 15 minutes of inactivity and needs a moment to wake up. Simply wait for it to load and it will work normally after that.
+
 ## 🚀 Getting Started
 
 1. **Clone the provided repository**
